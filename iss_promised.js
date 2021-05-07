@@ -25,25 +25,37 @@ const fetchCoordsByIP = function(body) {
  * Returns: Promise of request for fly over data, returned as JSON string
  */
 const fetchISSFlyOverTimes = function(body) {
-  const { latitude, longitude } = JSON.parse(body).data;
-  const url = `http://api.open-notify.org/iss-pass.json?lat=${latitude}&lon=${longitude}`;
+  const times = JSON.parse(body);
+  const url = `http://api.open-notify.org/iss-pass.json?lat=${times.latitude}&lon=${times.longitude}`;
   return request(url);
+};
+
+const printPassTimes = function(passTimes) {
+  const times = JSON.parse(passTimes);
+  for (const pass of times.response) {
+    const datetime = new Date(0);
+    datetime.setUTCSeconds(pass.risetime);
+    const duration = pass.duration;
+    console.log(`Next pass at ${datetime} for ${duration} seconds!`);
+  }
 };
 
 /*
  * Input: None
  * Returns: Promise for fly over data for users location
  */
-const nextISSTimesForMyLocation = function() {
-  return fetchMyIP()
-    .then(fetchCoordsByIP)
-    .then(fetchISSFlyOverTimes)
-    .then((data) => {
-      const { response } = JSON.parse(data);
-      return response;
-    });
-};
+// const nextISSTimesForMyLocation = function() {
+//   return fetchMyIP()
+//     .then(fetchCoordsByIP)
+//     .then(fetchISSFlyOverTimes)
+//     .then(printPassTimes)
+//     .then((data) => {
+//       const { response } = JSON.parse(data);
+//       return response;
+//     });
+// };
 
-module.exports = { nextISSTimesForMyLocation };
-// module.exports = { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes };
+
+// module.exports = { nextISSTimesForMyLocation };
+module.exports = { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes, printPassTimes };
 
